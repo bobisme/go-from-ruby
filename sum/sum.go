@@ -17,7 +17,6 @@ const (
 	ErrUnknown
 )
 
-
 // There must not be a space in "//export" otherwile the function will not get
 // exported.  The export directive must have the exact, case-sensetive
 // function name.
@@ -53,7 +52,7 @@ func Sum(intList unsafe.Pointer, length int) int {
 }
 
 // ToInt converts _positive_ integer strings to integers.
-// Out should be a [1]int, *int.
+// Out should be a pointer to an int.
 //export ToInt
 func ToInt(in *C.char, out unsafe.Pointer) (errorCode Err) {
 	// Convert the input c string to a go string.
@@ -67,14 +66,14 @@ func ToInt(in *C.char, out unsafe.Pointer) (errorCode Err) {
 	if i < 0 {
 		return ErrNoNegatives
 	}
-	// Cast the output pointer to a 1-length int array and assign the
+	// Cast the output pointer to the proper pointer type and store
 	// resulting value there.
-	(*[1]int)(out)[0] = i
+	*(*int)(out) = i
 	return 0
 }
 
 // FromInt converts _positive_ integer to a string.
-// Out is **char, a pointer to a string, a [1]*C.char.
+// Out is **char, a pointer to a string, a **C.char.
 //export FromInt
 func FromInt(in int, out unsafe.Pointer) (error *C.char) {
 	// Stupid error condition for example purposes.
@@ -83,9 +82,9 @@ func FromInt(in int, out unsafe.Pointer) (error *C.char) {
 	}
 	// Normal go stuff.
 	a := strconv.Itoa(in)
-	// Convert the go string to a c string and assign its address to the first
+	// Convert the go string to a c string and assign its address to the
 	// block of memory pointed to by out.
-	(*[1]*C.char)(out)[0] = C.CString(a)
+	*(**C.char)(out) = C.CString(a)
 	return nil
 }
 
