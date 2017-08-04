@@ -2,7 +2,7 @@ package main
 
 // must be the main package
 
-// Importing C is required even though it's not used in this file.
+// Importing C is required even if it were not used in this file.
 
 import "C"
 import (
@@ -10,16 +10,17 @@ import (
 	"unsafe"
 )
 
-// There must not be a space in "//export" otherwile the function will not get
-// exported.
-// The export directive must have the exact, case-sensetive function name.
-
 type Err int
 
 const (
 	ErrNoNegatives Err = iota + 1
 	ErrUnknown
 )
+
+
+// There must not be a space in "//export" otherwile the function will not get
+// exported.  The export directive must have the exact, case-sensetive
+// function name.
 
 //export Add
 func Add(a int, b int) int {
@@ -52,7 +53,7 @@ func Sum(intList unsafe.Pointer, length int) int {
 }
 
 // ToInt converts _positive_ integer strings to integers.
-// Out should be an [1]int.
+// Out should be a [1]int, *int.
 //export ToInt
 func ToInt(in *C.char, out unsafe.Pointer) (errorCode Err) {
 	// Convert the input c string to a go string.
